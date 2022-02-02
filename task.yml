@@ -1,0 +1,18 @@
+---
+- name: Unarchive a file that is already on the remote machine
+  ansible.builtin.unarchive:
+    src: /home/ec2-user/ansible/2020-05-21_AMS_CLI (4).zip
+    dest: /home/ec2-user/ansible
+    remote_src: yes
+    mode: 0755
+- name: Install pexpect module
+  yum:
+    name: pexpect
+    state: latest
+- name: Execute the script
+  ansible.builtin.expect:
+    chdir: "{{ dir }}"
+    command: ./"{{ exectuable_filename }}"
+    responses:
+      (.*)Please type the number with the desired option(.*): "1"
+

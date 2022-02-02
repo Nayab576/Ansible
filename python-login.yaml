@@ -1,0 +1,34 @@
+---
+ - name: Install python login page
+   hosts: localhost
+     #become: true
+   tasks:
+     - name: Install the package
+       become: true
+       pip:
+         name: django
+         state: present
+
+     - name: Install git
+       become: true
+       yum:
+       vars:
+         ansible_python_interpreter: /usr/bin/python2
+         name: git
+         state: present
+
+     - name: Clone the repo
+       become: true
+       git:
+         repo: 'https://github.com/jishoy-cloudjournee/User-Authentication-Login-Register-Logout-Python-Django-.git'
+         dest: /home/ec2-user/clone
+         force: yes
+       ignore_errors: yes
+
+
+     - name: Run task
+       shell:
+         chdir: /home/ec2-user/clone/my_site
+         cmd: nohup  python manage.py runserver 0.0.0.0:8002  &
+       async: 45
+       poll: 0

@@ -1,0 +1,33 @@
+---
+ - name: Install and configure awscliV2
+   hosts: localhost
+   #become: yes
+   tasks:
+      - name: Check whether awsCli version exsist
+        shell: aws --version
+        register: awscli_exist
+        ignore_errors: yes
+
+      - name: remove cli
+        pip:
+          name: awscli
+          state: absent
+        when: awscli_exist.rc == 0
+
+      - name: Install packages
+        pip: name=unzip state=present
+
+
+      - name: Download awcli2
+        unarchive:
+          src:  "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+          dest: /tmp
+          remote_src: true
+          creates: /tmp/aws
+
+      - name: Run the installer
+        command:
+        args:
+            cmd: /tmp/aws/install
+            creates: /usr/local/bin/aws
+        become: true

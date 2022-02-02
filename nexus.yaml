@@ -1,0 +1,83 @@
+---
+ - name: Install and configure Sonarqube                                                                                                                                   hosts: localhost                                                                                                                                                        become: yes
+   vars:
+     - ansible_python_interpreter: /usr/bin/python2.7
+   tasks:
+
+     - name: upgrade packages
+       yum:
+         name: '*'
+         state: latest
+         update_cache: yes
+
+     - name: Install java
+       yum:
+         name: '{{ item }}'
+         state: present
+       with_items:
+         - java-1.8.0-openjdk.x86_64
+         - unzip
+
+
+     - name: Download nexus
+       get_url:
+          url:  https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+          dest: /app
+
+
+     - name: unarchive the nexus
+       unarchive:
+         src: /app/nexus-3.37.3-02-unix.tar.gz
+         dest: /app
+         remote_src: yes
+
+     - name: rename the file
+       shell: mv /app/nexus-3.37.3-02  /app/nexus
+       ignore_errors: yes
+
+
+     - name: Create the nexus user for running the nexus services
+       user:
+          name: nexus
+
+     - name: Change  the ownership of nexus files and nexus data directory to nexus user
+       file:
+         path:  '{{item}}'
+         owner: nexus
+         group: nexus
+         recurse: yes
+       loop:
+         - /app/nexus
+         - /app/sonatype-work
+
+     - name: Configure to run nexus as nexus user
+       lineinfile:
+         path: '/app/nexus/bin/nexus.rc'
+           #regexp: 'run_as_user="nexus"'
+           #insertafter: "#run_as_user="
+         line: 'run_as_user="nexus"'
+         state: present
+
+
+     - name: Create a nexus systemd unit file
+       copy:
+         src: /home/ec2-user/ansible/nexus.service
+         dest: /etc/systemd/system/nexus.service
+
+
+           #     - name: Create a symbolic link
+           # file:
+           # src: '/opt/nexus/bin/nexus'
+           # dest: '/etc/init.d/nexus'
+           #state: link
+
+
+
+
+
+     - name: Enable the nexus service
+        systemd:
+         state: started
+         enabled: yes
+         daemon_reload: yes
+         name: nexus

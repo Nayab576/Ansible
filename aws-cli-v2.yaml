@@ -1,0 +1,30 @@
+---
+ - name: install aws cli
+   hosts: localhost
+   connection: local
+   become: true
+   #vars:
+   #ansible_python_interpreter: /usr/bin/python3.8
+   tasks:
+
+    - name: Install package dependencies.
+      package: name={{ item }} state=present
+      with_items:
+       - python3
+       - unzip
+
+    - name: Download awscliv2 installer.
+      unarchive:
+       src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+       dest: /tmp
+       remote_src: true
+       creates: /tmp/aws   
+       mode: 0755
+                                                                                                                                                    mode: 0755                                                                                                                                                                                                                                                                                                                                   - name: Run the installer.
+    - name: Run the installer
+      command:
+      args:
+        cmd: /tmp/aws/install
+        creates: /usr/local/bin/aws
+      become: true
+      register: aws_install

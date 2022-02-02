@@ -1,0 +1,31 @@
+---
+ - name: Install and configure  aws AMS
+   hosts: localhost
+     #vars_prompt:
+     # - name: "Install_amsCLI"
+     # prompt: "Please type the number with the desired option"
+     # private: no
+
+   #become: yes
+   tasks:
+     - name: Download amscli
+       unarchive:
+          src:  "/home/ec2-user/aws/amscli.zip"
+          dest: /home/ec2-user/aws/
+          remote_src: yes
+            #ode: 0755
+          #creates: /tmp/aws
+
+            # - name: Install amscli
+            # command:
+            #args:
+            #cmd: /home/ec2-user/aws/2020-05-21_AMS_CLI/Linux\ and\ Mac/AWSManagedServices_InstallCLI.sh
+            # when: Install_amsCLI == "Yes"
+
+
+     - name: Instal amsclo
+       expect:
+         chdir:  /home/ec2-user/aws/2020-05-21_AMS_CLI/linux/
+         command: ./AWSManagedServices_InstallCLI.sh
+         responses:
+             Please type the number with the desired option: "1"
