@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+    - name : Install JDK 1.8
+      apt: name=openjdk-8-jdk state=present
+    - name: Install Git
+      apt: name=git state=present
