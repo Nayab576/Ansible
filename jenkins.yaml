@@ -1,6 +1,6 @@
 ---
  - name: Install and configure Jenkins
-   hosts: localhost
+   hosts: all
    become: yes
    tasks:
       - name: Adding jenkins repo
