@@ -1,7 +1,6 @@
 ---
  - name: Install and configure Jenkins
    hosts: all
-   become: yes
    tasks:
       - name: Adding jenkins repo
         apt_key:
