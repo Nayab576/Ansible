@@ -1,0 +1,38 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+   - name: install jdk
+     become: yes
+     apt:
+       name: openjdk-11-jdk
+       state: present
+   - name: change directory
+     become: yes
+     command: echo $PWD
+     args:
+        chdir: /usr/local
+   - name: Download apache maven using get_url
+     become: yes
+     get_url:
+       url: https://www-eu.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
+       dest: /usr/local
+       mode: 0755
+   - name: Unarchive a file that is already on the remote machine
+     unarchive:
+       src: /usr/local/apache-maven-3.6.3-bin.tar.gz
+       dest: /usr/local
+       remote_src: yes
+   - name: Move nexus to opt
+     command: mv /usr/local/apache-maven-3.6.3 /usr/local/maven
+   - name: copy the content to a file
+     copy:
+       dest: /etc/profile.d/maven.sh
+       content: |
+            export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+            export M2_HOME=/usr/local/maven
+            export MAVEN_HOME=/usr/local/maven
+            export PATH=${M2_HOME}/bin:${PATH}
+   - name: Changing perm of "apachemaven.sh", adding "+x"
+     shell: nohup /etc/profile.d/maven.sh
+
