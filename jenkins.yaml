@@ -1,6 +1,6 @@
 ---
  - name: Install and configure Jenkins
-   hosts: 18.222.228.204
+   hosts: all
    become: yes
    tasks:
       - name: Adding jenkins repo
