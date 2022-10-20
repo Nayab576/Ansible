@@ -1,6 +1,6 @@
 ---
  - name: Install and configure awscliV2
-   hosts: all
+   hosts: jenkins_server
    #become: yes
    tasks:
       - name: install pip3
