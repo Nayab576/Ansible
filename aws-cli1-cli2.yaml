@@ -1,6 +1,6 @@
 ---
  - name: Install and configure awscliV2
-   hosts: localhost
+   hosts: all
    #become: yes
    tasks:
       - name: Check whether awsCli version exsist
