@@ -3,6 +3,8 @@
    hosts: jenkins_server
    #become: yes
    tasks:
+      - name: update ubuntu
+        apt: name=update state=present
       - name: install pip3
         apt: name=python3-pip state=present
       - name: Check whether awsCli version exsist
