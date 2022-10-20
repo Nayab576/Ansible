@@ -1,6 +1,6 @@
 ---
  - name: install aws cli
-   hosts: localhost
+   hosts: jenkins_server
    connection: local
    become: true
    #vars:
