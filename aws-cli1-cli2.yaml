@@ -6,7 +6,7 @@
       - name: update ubuntu
         apt: name=update state=present
       - name: install pip3
-        apt: name=python3-pip state=present
+        apt: name=pip state=present
       - name: Check whether awsCli version exsist
         shell: aws --version
         register: awscli_exist
