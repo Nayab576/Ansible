@@ -1,6 +1,6 @@
 ---
 - name: nexus install and start service
-  hosts: demo
+  hosts: jenkins_server
   become: yes
   become_user: root
 
