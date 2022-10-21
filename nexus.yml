@@ -1,0 +1,106 @@
+---
+- name: nexus install and start service
+  hosts: demo
+  become: yes
+  become_user: root
+
+  tasks:
+  - name: update
+    yum: 
+      name: '*'
+      state: latest
+
+  - name: Install java version 8
+    yum:
+      name: java-1.8.0-openjdk.x86_64
+      state: present
+
+  - name: Make new directory
+    file:
+      path: /app
+      state: directory 
+
+  - name: download nexus 
+    get_url:
+      url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+      dest: /app
+
+  - name: extract nexus-latest-bundle.tar.gz file
+    unarchive:
+      src: /app/nexus-3.41.0-01-unix.tar.gz
+      dest: /app
+      remote_src: true 
+  
+  - name: rename untared files to nexus
+    ansible.builtin.copy:
+      remote_src: true
+      src: /app/nexus-3.41.0-01/
+      dest: /app/nexus
+
+  - name: Remove old file
+    ansible.builtin.file:
+      path: /app/nexus-3.41.0-01
+      state: absent
+      
+  - name: add user
+    ansible.builtin.user:
+      name: nexus
+
+  - name: add group
+    ansible.builtin.group:
+      name: nexus
+
+  - name: Change the ownership of nexus to nexus user and sonatype-work.
+    ansible.builtin.file:
+      path: /app/nexus
+      owner: nexus
+      group: nexus
+      state: directory
+      recurse: yes
+
+  - name: Change the ownership of sonatype-work to nexus user.
+    ansible.builtin.file:
+      path: /app/sonatype-work
+      owner: nexus
+      group: nexus
+      state: directory
+      recurse: yes
+
+  - name: run as user "nexus"
+    replace:
+      path: /app/nexus/bin/nexus.rc
+      regexp: '#run_as_user=""'
+      replace: 'run_as_user="nexus"'
+
+  - name: Create a nexus systemd unit file
+    file:
+      path: /etc/systemd/system/nexus.service
+      state: touch
+
+  - name: Creating a file with content
+    copy:
+      dest: /etc/systemd/system/nexus.service
+      content: |
+        [Unit]
+        Description=nexus service
+        After=network.target
+
+        [Service]
+        Type=forking
+        LimitNOFILE=65536
+        User=nexus
+        Group=nexus
+        ExecStart=/app/nexus/bin/nexus start
+        ExecStop=/app/nexus/bin/nexus stop
+        User=nexus
+        Restart=on-abort
+
+        [Install]
+        WantedBy=multi-user.target
+
+  - name: add nexus service to boot and start it
+    systemd: 
+      state: started
+      enabled: yes
+      daemon_reload: yes
+      name: nexus
